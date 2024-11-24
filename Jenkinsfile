@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB = 'mohamedgaber353'
-        IMAGE_TAG = "${BUILD_ID}"  
+        IMAGE_TAG = "${BUILD_ID}"
     }
 
     stages {
@@ -16,16 +16,16 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Use bash explicitly for compatibility
+                    // Build Docker image
                     sh '''
                         #!/bin/bash
-                        docker build -t DOCKERHUB/app:IMAGE_TAG .
+                        docker build -t ${DOCKERHUB}/app:${IMAGE_TAG} .
                     '''
                 }
             }
         }
-    }
-   stage('Docker Login') {
+
+        stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_hub', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                     script {
@@ -38,26 +38,23 @@ pipeline {
                 }
             }
         }
-    stage('Push Docker Image') {
+
+        stage('Push Docker Image') {
             steps {
                 script {
-                    // Push the Docker image
+                    // Push Docker image
                     sh '''
                         #!/bin/bash
-                        docker push DOCKERHUB/pipe_app:IMAGE_TAG
+                        docker push ${DOCKERHUB}/app:${IMAGE_TAG}
                     '''
                 }
             }
         }
-    
-
-   
-}
-
-    
+    }
 
     post {
         always {
             cleanWs()
         }
     }
+}
